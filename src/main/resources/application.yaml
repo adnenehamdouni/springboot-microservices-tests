@@ -3,10 +3,8 @@ server:
 spring:
   application:
     name: springboot-microservices-tests
-  datasource:
-    url: jdbc:mysql://localhost:8889/microservices_db
-    username: root
-    password: root
+  profiles:
+    active: @spring.profiles.active@
   jpa:
     hibernate:
       ddl-auto: update

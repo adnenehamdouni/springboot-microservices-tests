@@ -7,6 +7,7 @@ import com.isquare.microservices.repository.ProductRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -17,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -40,14 +42,22 @@ public class ProductServiceImpl implements ProductService {
     @CachePut(value = "products", key = "#product.id")
     public Product createProduct(@Valid Product product) {
         log.info("Creating new product with name: {}", product.getName());
-        if (productRepository.findByNameIgnoreCase(product.getName()).isPresent()) {
-            log.error("Product already exists with name: {}", product.getName());
-            throw new ProductAlreadyExistsException("Product with name " + product.getName() + " already exists");
+        List<Product> existingProducts = searchProductsByName(product.getName());
+
+        Optional<Product> existingProduct = existingProducts.stream()
+                .filter(p -> p.getName().equalsIgnoreCase(product.getName()))
+                .findFirst();
+
+        if (existingProduct.isPresent()) {
+            log.info("Product exists, updating product with id: {}", existingProduct.get().getId());
+            return updateProduct(existingProduct.get().getId(), product);
         }
+
         Product savedProduct = productRepository.save(product);
         log.debug("Product created successfully with id: {}", savedProduct.getId());
         return savedProduct;
     }
+
 
     @Override
     @Cacheable(value = "products")
@@ -122,12 +132,19 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @CacheEvict(value = "products", key = "#id")
-    public void deleteProduct(Long id) {
+    public void deleteProduct(@NotNull Long id) {
         log.info("Deleting product with id: {}", id);
         if (!productRepository.existsById(id)) {
+            log.error("Product not found with id: {}", id);
             throw new ProductNotFoundException("Product not found with id: " + id);
         }
-        productRepository.deleteById(id);
+        try {
+            productRepository.deleteById(id);
+            log.debug("Product deleted successfully: {}", id);
+        } catch (Exception e) {
+            log.error("Error deleting product: {}", e.getMessage());
+            throw new RuntimeException("Error deleting product");
+        }
     }
 
     @Override

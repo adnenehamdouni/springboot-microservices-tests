@@ -62,9 +62,9 @@ This project is a Spring Boot application designed to manage products. It includ
     ```
 
 3. **Access the application**:
-    - API: `http://localhost:8080/api/v1/products`
-    - Web UI: `http://localhost:8080/products`
-    - H2 Console (dev profile): `http://localhost:8080/h2-console`
+   - API: `http://localhost:8080/api/v1/products`
+   - Web UI: `http://localhost:8080/products`
+   - H2 Console (dev profile): `http://localhost:8080/h2-console`
 
 ### Running Tests
 
@@ -83,9 +83,35 @@ This project is a Spring Boot application designed to manage products. It includ
     mvn test -Dtest=CucumberTest
     ```
 
+### Example API Requests
+
+- **Create a Product**:
+    ```sh
+    curl -X POST "http://localhost:8080/api/v1/products" -H "Content-Type: application/json" -d '{"name": "New Product", "description": "New Description", "price": 99.99}'
+    ```
+
+- **Get a Product by ID**:
+    ```sh
+    curl -X GET "http://localhost:8080/api/v1/products/1"
+    ```
+
+- **Update a Product**:
+    ```sh
+    curl -X PUT "http://localhost:8080/api/v1/products/1" -H "Content-Type: application/json" -d '{"name": "Updated Product", "description": "Updated Description", "price": 199.99}'
+    ```
+
+- **Delete a Product**:
+    ```sh
+    curl -X DELETE "http://localhost:8080/api/v1/products/1"
+    ```
+
 ## API Documentation
 
 The API documentation is available at `http://localhost:8080/swagger-ui.html`.
+
+## Postman
+
+A Postman collection is available to test the API endpoints. Import the `postman_collection.json` file into Postman.
 
 ## Contributing
 

@@ -50,6 +50,75 @@ For further reference, please consider the following sections:
     - Web UI: `http://localhost:8080/products`
     - H2 Console (dev profile): `http://localhost:8080/h2-console`
 
+# Help Guide
+
+## Getting Started
+
+### Prerequisites
+
+- Java 17
+- Maven
+- MySQL
+
+### Installation Steps
+
+1. **Clone the repository**:
+    ```sh
+    git clone https://github.com/adnenehamdouni/springboot-microservices-tests.git
+    cd springboot-microservices-tests
+    ```
+
+2. **Set up MySQL database**:
+    ```sh
+    mysql -u root -p
+    CREATE DATABASE microservices_db;
+    ```
+
+3. **Configure application properties**:
+   Update the `application-qa.yaml` file with your MySQL credentials.
+
+### Running the Application
+
+1. **Build the project**:
+    ```sh
+    mvn clean install
+    ```
+
+2. **Run the application**:
+    ```sh
+    mvn spring-boot:run -Dspring-boot.run.profiles=qa
+    ```
+
+3. **Access the application**:
+   - API: `http://localhost:8080/api/v1/products`
+   - Web UI: `http://localhost:8080/products`
+   - H2 Console (dev profile): `http://localhost:8080/h2-console`
+
+## Profiles
+
+- **dev**: Uses H2 in-memory database.
+- **qa**: Uses MySQL database for QA environment.
+- **prod**: Uses MySQL database for production environment.
+
+## API Documentation
+
+API documentation is available via Swagger:
+- Swagger UI: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- API Docs: [http://localhost:8080/api-docs](http://localhost:8080/api-docs)
+
+## Postman
+
+A Postman collection is available to test the API endpoints. Import the `postman_collection.json` file into Postman.
+
+## Testing
+
+### Unit and Integration Tests
+
+Unit and integration tests are located in the `src/test/java` directory and can be run using:
+```sh
+mvn test
+```
+
 ### Running Tests
 
 1. **Unit and Integration Tests**:

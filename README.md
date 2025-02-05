@@ -6,6 +6,7 @@ This project is a Spring Boot application designed to manage products. It includ
 
 ## Project Structure
 
+```
 springboot-microservices-tests
 ├── pom.xml
 ├── README.md
@@ -66,6 +67,7 @@ springboot-microservices-tests
 │   │       └── features
 │   │           └── product.feature
 └── target
+```
 
 ## Technologies Used
 

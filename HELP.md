@@ -159,6 +159,27 @@ mvn test
     mysql -h localhost -P 8889 -u root -p
     ```
 
+## Postman
+
+A Postman collection is available to test the API endpoints. Import the `postman_collection.json` file into Postman.
+
+### Postman Scripts
+
+#### Pre-request Script
+
+```javascript
+// Example pre-request script
+pm.environment.set("baseUrl", "http://localhost:8080");
+```
+
+#### Test Script
+```
+// Example test script
+pm.test("Status code is 200", function () {
+pm.response.to.have.status(200);
+});
+```
+
 ## Additional Resources
 
 - [Spring Boot Documentation](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)

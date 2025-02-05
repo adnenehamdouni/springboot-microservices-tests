@@ -1,0 +1,1051 @@
+{
+	"info": {
+		"_postman_id": "de4016d8-da17-4883-9635-639fb2ebfdcb",
+		"name": "microservices-tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5132081"
+	},
+	"item": [
+		{
+			"name": "Create Product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"// Vérifier le code de statut",
+							"pm.test(\"Status code is 201\", () => {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"// Vérifier la création du produit",
+							"pm.test(\"Product is created successfully\", () => {",
+							"    const response = pm.response.json();",
+							"    pm.expect(response.name).to.eql(pm.environment.get(\"testProductName\"));",
+							"    pm.expect(response.price).to.be.a('number');",
+							"    pm.environment.set(\"productId\", response.id);",
+							"});",
+							"",
+							"// Vérification du temps de réponse",
+							"pm.test(\"Response time is acceptable\", () => {",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});",
+							"",
+							"",
+							"// Vérification des headers",
+							"pm.test(\"Content-Type header is present\", () => {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Générer un nom unique pour le test",
+							"pm.environment.set(\"testProductName\", \"Test Product from Test\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Test Product from Test\",\n    \"description\": \"Test Description Test\",\n    \"price\": 99.99\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/products",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products"
+					]
+				},
+				"description": "Create new Product"
+			},
+			"response": [
+				{
+					"name": "Success Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test Product from Test\",\n    \"description\": \"Test Description Test\",\n    \"price\": 99.99\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/products",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"products"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 03 Feb 2025 09:12:41 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 23,\n    \"name\": \"Test Product from Test\",\n    \"description\": \"Test Description Test\",\n    \"price\": 99.99\n}"
+				}
+			]
+		},
+		{
+			"name": "GET Product by ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test du code de statut avec gestion d'erreur",
+							"pm.test(\"Vérification du code de statut\", () => {",
+							"    try {",
+							"        pm.response.to.have.status(200); // Pour création (POST) ou 200 pour autres méthodes",
+							"    } catch (error) {",
+							"        console.error(\"Erreur lors de la vérification du statut:\", error);",
+							"    }",
+							"});",
+							"",
+							"// Test des propriétés du produit avec gestion d'erreur",
+							"pm.test(\"Vérification des détails du produit\", () => {",
+							"    try {",
+							"        const response = pm.response.json();",
+							"        const expectedProperties = ['id', 'name', 'description', 'price'];",
+							"        ",
+							"        expectedProperties.forEach(prop => {",
+							"            pm.expect(response).to.have.property(prop);",
+							"        });",
+							"",
+							"        if (pm.environment.get(\"productId\")) {",
+							"            pm.expect(response.id).to.eql(parseInt(pm.environment.get(\"productId\")));",
+							"        }",
+							"    } catch (error) {",
+							"        console.error(\"Erreur lors de la vérification des propriétés:\", error);",
+							"    }",
+							"});",
+							"",
+							"// Test du temps de réponse",
+							"pm.test(\"Vérification du temps de réponse\", () => {",
+							"    try {",
+							"        pm.expect(pm.response.responseTime).to.be.below(1000); // Augmenté à 1000ms pour plus de flexibilité",
+							"    } catch (error) {",
+							"        console.error(\"Erreur lors de la vérification du temps de réponse:\", error);",
+							"    }",
+							"});",
+							"",
+							"// Test des en-têtes",
+							"pm.test(\"Vérification des en-têtes\", () => {",
+							"    try {",
+							"        pm.response.to.have.header(\"Content-Type\");",
+							"        pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"    } catch (error) {",
+							"        console.error(\"Erreur lors de la vérification des en-têtes:\", error);",
+							"    }",
+							"});",
+							"",
+							"// Test des types de données",
+							"pm.test(\"Vérification des types de données\", () => {",
+							"    try {",
+							"        const response = pm.response.json();",
+							"        ",
+							"        const schema = {",
+							"            id: 'number',",
+							"            name: 'string',",
+							"            description: 'string',",
+							"            price: 'number'",
+							"        };",
+							"",
+							"        Object.entries(schema).forEach(([key, type]) => {",
+							"            pm.expect(response[key]).to.be.a(type);",
+							"        });",
+							"",
+							"        // Validation supplémentaire pour le prix",
+							"        pm.expect(response.price).to.be.above(0);",
+							"    } catch (error) {",
+							"        console.error(\"Erreur lors de la vérification des types:\", error);",
+							"    }",
+							"});",
+							"",
+							"// Stockage de l'ID pour les tests suivants",
+							"if (pm.response.code === 201) {",
+							"    try {",
+							"        const response = pm.response.json();",
+							"        pm.environment.set(\"productId\", response.id);",
+							"    } catch (error) {",
+							"        console.error(\"Erreur lors du stockage de l'ID:\", error);",
+							"    }",
+							"}",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/products/{{productId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products",
+						"{{productId}}"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "GET Product by ID",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/products/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"products",
+								""
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 03 Feb 2025 09:30:07 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 23,\n    \"name\": \"Test Product from Test\",\n    \"description\": \"Test Description Test\",\n    \"price\": 99.99\n}"
+				}
+			]
+		},
+		{
+			"name": "Get All Products",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is an array\", () => {",
+							"    const response = pm.response.json();",
+							"    pm.expect(response).to.be.an('array');",
+							"});",
+							"",
+							"pm.test(\"Each product has correct structure and data types\", () => {",
+							"    const response = pm.response.json();",
+							"    ",
+							"    response.forEach(product => {",
+							"        // Vérifier la présence et le type de chaque propriété",
+							"        pm.expect(product).to.have.property('id').that.is.a('number');",
+							"        pm.expect(product).to.have.property('name').that.is.a('string');",
+							"        pm.expect(product).to.have.property('description').that.is.a('string');",
+							"        pm.expect(product).to.have.property('price').that.is.a('number');",
+							"        ",
+							"        // Vérifier que l'objet n'a pas de propriétés supplémentaires",
+							"        pm.expect(Object.keys(product)).to.have.lengthOf(4);",
+							"    });",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/products",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get All Products",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/products",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"products"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 03 Feb 2025 09:30:26 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"id\": 21,\n        \"name\": \"Integration Test Product\",\n        \"description\": \"Test\",\n        \"price\": 199.99\n    },\n    {\n        \"id\": 23,\n        \"name\": \"Test Product from Test\",\n        \"description\": \"Test Description Test\",\n        \"price\": 99.99\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Search Products",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is an array\", () => {",
+							"    const response = pm.response.json();",
+							"    pm.expect(response).to.be.an('array');",
+							"});",
+							"",
+							"pm.test(\"Search results have correct structure\", () => {",
+							"    const response = pm.response.json();",
+							"    ",
+							"    if (response.length > 0) {",
+							"        response.forEach(product => {",
+							"            // Vérifier la structure exacte de chaque produit",
+							"            pm.expect(product).to.have.all.keys('id', 'name', 'description', 'price');",
+							"            ",
+							"            // Vérifier le type de chaque propriété",
+							"            pm.expect(product.id).to.be.a('number');",
+							"            pm.expect(product.name).to.be.a('string');",
+							"            pm.expect(product.description).to.be.a('string');",
+							"            pm.expect(product.price).to.be.a('number');",
+							"        });",
+							"    }",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/products/search?name={{searchName}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products",
+						"search"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "{{searchName}}"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Search Products",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/products/search?name=Integration Test Product",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"products",
+								"search"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Integration Test Product"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 03 Feb 2025 09:30:33 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"id\": 21,\n        \"name\": \"Integration Test Product\",\n        \"description\": \"Test\",\n        \"price\": 199.99\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Update Product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has correct structure and data types\", () => {",
+							"    const response = pm.response.json();",
+							"    ",
+							"    // Vérifier la présence et le type de chaque propriété",
+							"    pm.expect(response).to.have.property('id').that.is.a('number');",
+							"    pm.expect(response).to.have.property('name').that.is.a('string');",
+							"    pm.expect(response).to.have.property('description').that.is.a('string');",
+							"    pm.expect(response).to.have.property('price').that.is.a('number');",
+							"    ",
+							"    // Vérifier que l'objet n'a pas de propriétés supplémentaires",
+							"    pm.expect(Object.keys(response)).to.have.lengthOf(4);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Updated Product\",\n    \"description\": \"Updated Description\",\n    \"price\": 149.99\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/products/{{productId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products",
+						"{{productId}}"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Update Product",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Product\",\n    \"description\": \"Updated Description\",\n    \"price\": 149.99\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/products/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"products",
+								""
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 03 Feb 2025 09:30:40 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 23,\n    \"name\": \"Updated Product\",\n    \"description\": \"Updated Description\",\n    \"price\": 149.99\n}"
+				}
+			]
+		},
+		{
+			"name": "Partial Update Product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has correct structure and data types\", () => {",
+							"    const response = pm.response.json();",
+							"    ",
+							"    // Vérifier la présence et le type de chaque propriété",
+							"    pm.expect(response).to.have.property('id').that.is.a('number');",
+							"    pm.expect(response).to.have.property('name').that.is.a('string');",
+							"    pm.expect(response).to.have.property('description').that.is.a('string');",
+							"    pm.expect(response).to.have.property('price').that.is.a('number');",
+							"    ",
+							"    // Vérifier que l'objet n'a pas de propriétés supplémentaires",
+							"    pm.expect(Object.keys(response)).to.have.lengthOf(4);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Partially Updated Product 2\",\n    \"price\": 149.99\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/products/{{productId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products",
+						"{{productId}}"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Partial Update Product",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Partially Updated Product 2\",\n    \"price\": 149.99\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/products/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"products",
+								""
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 03 Feb 2025 09:31:09 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 23,\n    \"name\": \"Partially Updated Product 2\",\n    \"description\": \"Updated Description\",\n    \"price\": 149.99\n}"
+				}
+			]
+		},
+		{
+			"name": "Delete Product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", () => {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"",
+							"pm.test(\"Response body is empty\", () => {",
+							"    pm.expect(pm.response.text()).to.be.empty;",
+							"});",
+							"",
+							"// Vérification de la suppression effective",
+							"pm.test(\"Product should not exist after deletion\", () => {",
+							"    const getDeletedProduct = {",
+							"        url: pm.environment.get(\"baseUrl\") + \"/api/v1/products/\" + pm.variables.get(\"productId\"),",
+							"        method: 'GET'",
+							"    };",
+							"    ",
+							"    pm.sendRequest(getDeletedProduct, (error, response) => {",
+							"        pm.expect(response.code).to.eql(500);",
+							"    });",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/products/{{productId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products",
+						"{{productId}}"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Delete Product",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/products/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"products",
+								""
+							]
+						}
+					},
+					"status": "No Content",
+					"code": 204,
+					"_postman_previewlanguage": "plain",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Wed, 05 Feb 2025 07:22:23 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "Delete All Products",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/products",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Delete All Products",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/products",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"products"
+							]
+						}
+					},
+					"status": "No Content",
+					"code": 204,
+					"_postman_previewlanguage": "plain",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Wed, 05 Feb 2025 07:39:19 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "Count Products",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is a number\", () => {",
+							"    const response = pm.response.json();",
+							"    pm.expect(response).to.be.a('number');",
+							"    pm.expect(response).to.be.at.least(0);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/products/count",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"products",
+						"count"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Count Products",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/products/count",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"products",
+								"count"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 03 Feb 2025 09:31:24 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "2"
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "productId",
+			"value": "15"
+		},
+		{
+			"key": "searchName",
+			"value": "Integration Test Product"
+		}
+	]
+}

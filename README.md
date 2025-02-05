@@ -4,6 +4,69 @@
 
 This project is a Spring Boot application designed to manage products. It includes a RESTful API for CRUD operations and a web interface for managing products. The project also includes automated tests using Selenium and Cucumber.
 
+## Project Structure
+
+springboot-microservices-tests
+├── pom.xml
+├── README.md
+├── HELP.md
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── com
+│   │   │       └── isquare
+│   │   │           └── microservices
+│   │   │               ├── controller
+│   │   │               │   ├── ProductController.java
+│   │   │               │   └── ProductUIController.java
+│   │   │               ├── model
+│   │   │               │   └── Product.java
+│   │   │               ├── repository
+│   │   │               │   └── ProductRepository.java
+│   │   │               ├── service
+│   │   │               │   ├── ProductService.java
+│   │   │               │   └── ProductServiceImpl.java
+│   │   │               └── config
+│   │   │                   ├── ProductAlreadyExistsException.java
+│   │   │                   ├── ProductNotFoundException.java
+│   │   │                   └── SeleniumConfig.java
+│   │   ├── resources
+│   │   │   ├── application.yaml
+│   │   │   ├── application-dev.yaml
+│   │   │   ├── application-qa.yaml
+│   │   │   ├── application-prod.yaml
+│   │   │   ├── scripts
+│   │   │   │   ├── MicroServices-Tests_Mock_Server.postman_environment.json
+│   │   │   │   ├── microservices-tests.postman_collection.json
+│   │   │   │   ├── Product-API-Test-Env.postman_environment.json
+│   │   │   └── templates
+│   │   │       ├── product_list.html
+│   │   │       ├── product_form.html
+│   │   │       └── product_detail.html
+│   ├── test
+│   │   ├── java
+│   │   │   └── com
+│   │   │       └── isquare
+│   │   │           └── microservices
+│   │   │               ├── automatisation
+│   │   │               │   ├── CucumberTest.java
+│   │   │               │   └── ProductUITest.java
+│   │   │               ├── config
+│   │   │               │   ├── CucumberSpringConfiguration.java
+│   │   │               │   ├── SeleniumConfig.java
+│   │   │               │   └── SharedWebTestConfig.java
+│   │   │               ├── controller
+│   │   │               │   └── ProductControllerTest.java
+│   │   │               ├── repository
+│   │   │               │   └── ProductIntegrationTest.java
+│   │   │               ├── service
+│   │   │               │   ├── ProductServiceImplTest.java
+│   │   │               │   └── ProductSteps.java
+│   │   └── resources
+│   │       └── features
+│   │           └── product.feature
+└── target
+
 ## Technologies Used
 
 - **Java**: 17
